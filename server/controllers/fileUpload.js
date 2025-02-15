@@ -2,16 +2,20 @@
 const { image } = require('../utils/cloudinaryConfig');
 const upload = require('../utils/upload');
 
-const uploadFile = async(req, res, next) => {
-    if(!req.file){
-        const error = new  Error('Please provide a image')
-        error.statusCode = 400
-        throw error
+const uploadFile = async (req, res, next) => {
+    try {
+        if (!req.file) {
+            const error = new Error('Please provide an image');
+            error.statusCode = 400;
+            throw error;
+        }
+
+        const result = await upload(req.file); // Upload the image to Cloudinary
+        res.status(200).json({ message: 'success', image: result?.secure_url });
+
+    } catch (error) {
+        next(error); // Pass the error to the middleware for proper handling
     }
-
-    const result = await upload(req.file);
-
-    res.status(200).json({message: 'success', image: result?.secure_url});
 };
 
 module.exports = uploadFile;

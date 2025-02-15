@@ -30,20 +30,47 @@ const fileChange = async (event) => {
         const formData = new FormData();
         formData.append('image', file);
 
-        const response = await fetch('https://localhost:5050/image/upload', {
-            method: 'POST',
-            body: formData,
-        });
+        // const response = await fetch('https://localhost:5050/image/upload', {
+        //     method: 'POST',
+        //     body: formData,
+        // });
 
-        const result = await response.json();
+        // const result = await response.json();
         
-        if(result.message === 'success') {
-            setPreview(prevPreview => 
-                prevPreview.map((item, index) => {
-                    index === prevPreview.length - 1 ? result?.image:item
-                })
-            );
+        // if(result.message === 'success') {
+        //     setPreview(prevPreview => 
+        //         prevPreview.map((item, index) => {
+        //             return index === prevPreview.length - 1 ? result?.image : item;
+        //         })
+        //     );
+        // }
+
+
+        try {
+            const response = await fetch('http://localhost:5050/image/upload', {
+                method: 'POST',
+                body: formData,
+            });
+        
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+        
+            const result = await response.json();
+            if (result.message === 'success') {
+                setPreview(prevPreview =>
+                    prevPreview.map((item, index) => {
+                        return index === prevPreview.length - 1 ? result?.image : item;
+                    })
+                );
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            // Handle error appropriately
         }
+        
     }
 
     //Code without integration of backend
